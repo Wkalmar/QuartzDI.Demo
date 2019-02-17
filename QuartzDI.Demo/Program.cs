@@ -16,11 +16,16 @@ namespace QuartzDI.Demo
         {
             IConfigurationSection connectionSection = GetConnectionSection();
             var serviceCollection = new ServiceCollection();
+            serviceCollection.AddOptions();
+            serviceCollection.Configure<DemoJobOptions>(options =>
+            {
+                options.Url = connectionSection["Url"];
+            });
             serviceCollection.AddScoped<DemoJob>();
             serviceCollection.AddScoped<IDemoService, DemoService>();
+            serviceCollection.AddScoped<DemoJobOptions>();
             var serviceProvider = serviceCollection.BuildServiceProvider();
 
-            DemoJob.Url = connectionSection["Url"];
             await ScheduleJob(serviceProvider);
             Console.ReadLine();
         }
