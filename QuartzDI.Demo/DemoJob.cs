@@ -6,7 +6,7 @@ namespace QuartzDI.Demo
 {
     public class DemoJob : IJob
     {
-        private const string Url = "i.ua";
+        public static string Url { get; set; }
 
         public static IDemoService DemoService { get; set; }
 
