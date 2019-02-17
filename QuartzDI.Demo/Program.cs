@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 using Quartz.Impl;
 using QuartzDi.Demo.Extrernal;
@@ -14,10 +15,13 @@ namespace QuartzDI.Demo
         async static Task Main(string[] args)
         {
             IConfigurationSection connectionSection = GetConnectionSection();
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddScoped<DemoJob>();
+            serviceCollection.AddScoped<IDemoService, DemoService>();
+            var serviceProvider = serviceCollection.BuildServiceProvider();
 
-            DemoJob.DemoService = new DemoService();
             DemoJob.Url = connectionSection["Url"];
-            await ScheduleJob();
+            await ScheduleJob(serviceProvider);
             Console.ReadLine();
         }
 
@@ -31,7 +35,7 @@ namespace QuartzDI.Demo
             return connectionSection;
         }
 
-        private static async Task ScheduleJob()
+        private static async Task ScheduleJob(IServiceProvider serviceProvider)
         {
             var props = new NameValueCollection
             {
@@ -39,6 +43,8 @@ namespace QuartzDI.Demo
             };
             var factory = new StdSchedulerFactory(props);
             var sched = await factory.GetScheduler();
+            sched.JobFactory = new DemoJobFactory(serviceProvider);
+
             await sched.Start();
             var job = JobBuilder.Create<DemoJob>()
                 .WithIdentity("myJob", "group1")

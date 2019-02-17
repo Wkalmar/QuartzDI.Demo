@@ -8,11 +8,16 @@ namespace QuartzDI.Demo
     {
         public static string Url { get; set; }
 
-        public static IDemoService DemoService { get; set; }
+        private readonly IDemoService _demoService;
+
+        public DemoJob(IDemoService demoService)
+        {
+            _demoService = demoService;
+        }
 
         public Task Execute(IJobExecutionContext context)
         {
-            DemoService.DoTask(Url);
+            _demoService.DoTask(Url);
             return Task.CompletedTask;
         }
     }
