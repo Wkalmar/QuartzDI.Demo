@@ -23,7 +23,6 @@ namespace QuartzDI.Demo
             });
             serviceCollection.AddScoped<DemoJob>();
             serviceCollection.AddScoped<IDemoService, DemoService>();
-            serviceCollection.AddScoped<DemoJobOptions>();
             var serviceProvider = serviceCollection.BuildServiceProvider();
 
             await ScheduleJob(serviceProvider);
@@ -63,5 +62,5 @@ namespace QuartzDI.Demo
             .Build();
             await sched.ScheduleJob(job, trigger);
         }
-    }    
+    }
 }
